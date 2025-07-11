@@ -1,0 +1,252 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  build-and-test:
+    name: Build and Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04, macos-12, macos-13]
+        include:
+          - os: ubuntu-22.04
+            install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit5-dev libgtest-dev cmake build-essential
+          - os: ubuntu-20.04
+            install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit4-dev libgtest-dev cmake build-essential
+          - os: macos-12
+            install_deps: brew install insighttoolkit googletest cmake
+          - os: macos-13
+            install_deps: brew install insighttoolkit googletest cmake
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - uses: aminya/setup-cpp@v1
+      with:
+        compiler: gcc
+
+    - name: Install dependencies
+      run: ${{ matrix.install_deps }}
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+
+    - name: Build project
+      run: |
+        cd build
+        make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu || echo 4)
+
+    - name: Run unit tests
+      run: |
+        cd build
+        ctest --output-on-failure --verbose
+
+    - name: Run integration tests
+      run: |
+        cd tests
+        chmod +x run_tests.sh
+        ./run_tests.sh -m integration
+
+    - name: Generate test coverage (Ubuntu only)
+      if: matrix.os == 'ubuntu-22.04'
+      run: |
+        cd build
+        sudo apt-get install -y lcov
+        lcov --capture --directory . --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' --output-file coverage.info
+        lcov --list coverage.info
+
+    - name: Upload coverage to Codecov (Ubuntu only)
+      if: matrix.os == 'ubuntu-22.04'
+      uses: codecov/codecov-action@v3
+      with:
+        file: build/coverage.info
+        flags: unittests
+        name: codecov-umbrella
+
+  clang-format-check:
+    name: Lint and Format Check
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install clang-format
+      run: sudo apt-get update && sudo apt-get install -y clang-format
+
+    - name: Check formatting
+      run: |
+        find src/ -name '*.cpp' -o -name '*.h' | xargs clang-format --dry-run --Werror
+
+  static-analysis:
+    name: Static Analysis (Cppcheck)
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install cppcheck
+      run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=all --inconclusive --xml --xml-version=2 src/ 2> cppcheck-report.xml || true
+
+    - name: Upload cppcheck results
+      uses: actions/upload-artifact@v3
+      with:
+        name: cppcheck-report
+        path: cppcheck-report.xml
+
+  memory-check:
+    name: Memory Leak Detection
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Valgrind and dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libinsighttoolkit5-dev libgtest-dev cmake build-essential valgrind
+
+    - name: Build with Debug Symbols
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+        make -j$(nproc)
+
+    - name: Run Valgrind
+      run: |
+        cd build
+        ctest -R "memory_leak_test" --verbose || true
+
+  codeql-scan:
+    name: Security Scan (CodeQL)
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: cpp
+
+    - name: Build for CodeQL
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug
+        make -j$(nproc)
+
+    - name: Analyze
+      uses: github/codeql-action/analyze@v3
+
+  documentation:
+    name: Build Documentation
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+    - name: Generate Doxygen Docs
+      run: |
+        if [ ! -f Doxyfile ]; then
+          doxygen -g
+          sed -i 's/PROJECT_NAME           = "My Project"/PROJECT_NAME = "NeuroCompass"/' Doxyfile
+          sed -i 's/INPUT                  =/INPUT = src/' Doxyfile
+          sed -i 's/RECURSIVE              = NO/RECURSIVE = YES/' Doxyfile
+          sed -i 's/OUTPUT_DIRECTORY       =/OUTPUT_DIRECTORY = docs\/doxygen/' Doxyfile
+        fi
+        mkdir -p docs/doxygen
+        doxygen
+
+    - name: Upload documentation
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: docs/doxygen/html/
+
+  benchmarks:
+    name: Performance Benchmarks
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y libinsighttoolkit5-dev libgtest-dev cmake build-essential
+
+    - name: Build for performance
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+        make -j$(nproc)
+
+    - name: Run performance tests
+      run: |
+        cd tests
+        chmod +x run_tests.sh
+        ./run_tests.sh -m performance
+
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmark-results
+        path: tests/test_output/performance/
+
+  release:
+    name: Create Release Artifacts
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'release'
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-13]
+        include:
+          - os: ubuntu-22.04
+            asset_name: neurocompass-linux-x64
+            install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit5-dev cmake build-essential
+          - os: macos-13
+            asset_name: neurocompass-macos-x64
+            install_deps: brew install insighttoolkit cmake
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: ${{ matrix.install_deps }}
+
+    - name: Build release
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install
+        make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu || echo 4)
+        make install
+
+    - name: Package release
+      run: tar -czf ${{ matrix.asset_name }}.tar.gz install/
+
+    - name: Upload release asset
+      uses: softprops/action-gh-release@v1
+      with:
+        name: ${{ matrix.asset_name }}.tar.gz
+        tag_name: ${{ github.ref_name }}
+        files: ${{ matrix.asset_name }}.tar.gz

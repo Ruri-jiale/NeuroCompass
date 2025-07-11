@@ -1,0 +1,18 @@
+﻿# Normalize all text files to LF in Git
+* text=auto eol=lf
+
+# Specific overrides (optional)
+*.sh     text eol=lf
+*.py     text eol=lf
+*.cpp    text
+*.h      text
+*.md     text
+*.json   text
+*.tsv    text
+
+# Binary files - do not touch line endings
+*.nii    binary
+*.nii.gz binary
+*.dcm    binary
+*.png    binary
+*.jpg    binary

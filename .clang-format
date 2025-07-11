@@ -1,0 +1,5 @@
+# BasedOnStyle (maybe LLVM、Google、Mozilla、WebKit et al.)
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 100
+AllowShortFunctionsOnASingleLine: Empty

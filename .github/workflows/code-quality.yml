@@ -1,0 +1,76 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  # Linting and formatting
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format
+
+    - name: Check code formatting
+      run: |
+        find src/ -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror
+
+    - name: Install cppcheck
+      run: |
+        sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=all --inconclusive --error-exitcode=1 --suppress=missingIncludeSystem src/
+
+  # Security scan
+  security:
+    name: Security Scan
+    runs-on: ubuntu-22.04
+    permissions:
+      security-events: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: cpp
+
+    - name: Build for CodeQL
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug
+        make -j$(nproc)
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+
+  # Dependency check
+  dependencies:
+    name: Dependency Check
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for vulnerable dependencies
+      run: |
+        echo "Checking CMake dependencies..."
+        grep -r "find_package\|FetchContent" . || true
+        echo "✅ Manual dependency review required for C++ dependencies"

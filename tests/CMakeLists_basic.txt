@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.16)
+project(NeuroCompassBasicTests)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Find required packages
+find_package(ITK REQUIRED)
+include(${ITK_USE_FILE})
+
+find_package(GTest QUIET)
+if(NOT GTest_FOUND)
+    # If Google Test is not found, we'll create a simple test runner
+    message(STATUS "Google Test not found, creating simple test runner")
+endif()
+
+# Include directories
+include_directories(${CMAKE_SOURCE_DIR}/..)
+
+# Create basic functionality test executable
+if(GTest_FOUND)
+    add_executable(basic_functionality_tests basic_functionality_tests.cpp)
+    target_link_libraries(basic_functionality_tests 
+        ${CMAKE_SOURCE_DIR}/../build/src/flirt_lite/libflirt_lite.a
+        ${ITK_LIBRARIES}
+        GTest::gtest
+        GTest::gtest_main
+    )
+else()
+    # Create a simple test without Google Test
+    add_executable(simple_basic_tests simple_basic_tests.cpp)
+    target_link_libraries(simple_basic_tests 
+        ${CMAKE_SOURCE_DIR}/../build/src/flirt_lite/libflirt_lite.a
+        ${ITK_LIBRARIES}
+    )
+endif()
+
+# Add test target
+if(GTest_FOUND)
+    enable_testing()
+    add_test(NAME BasicFunctionality COMMAND basic_functionality_tests)
+endif()

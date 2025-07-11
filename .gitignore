@@ -1,0 +1,122 @@
+# ================================
+# 💻 Build and Binary Files
+# ================================
+build/
+bin/
+lib/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+
+# ================================
+# 🚀 NeuroCompass Executables
+# ================================
+neurocompass_motion
+mcflirt_standalone
+
+# ================================
+# 🧠 Medical Imaging Data (Do NOT commit real data)
+# ================================
+*.nii
+*.nii.gz
+*.img
+*.hdr
+openneuro/
+test_data/
+"open neuro"/
+
+# ================================
+# 🧪 Test & Temporary Files
+# ================================
+motion_parameters.par
+*.tmp
+*.temp
+test_output/
+results/
+output/
+logs/
+
+# ================================
+# 📂 OS-Generated Files
+# ================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ================================
+# 🧰 IDE & Editor Configs
+# ================================
+.vscode/
+.idea/
+*.user
+*.code-workspace
+*.swp
+*.swo
+*~
+
+# ================================
+# 🐍 Python & Virtual Envs (if scripting involved)
+# ================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+
+# ================================
+# 📈 Logs, Cores & Backup Files
+# ================================
+*.log
+*.bak
+core
+*.core
+
+# ================================
+# 🎯 Code Coverage & Profiling
+# ================================
+*.gcov
+*.gcno
+*.gcda
+coverage.info
+coverage/
+
+# ================================
+# 📦 Archives & Installers
+# ================================
+*.tar
+*.tar.gz
+*.zip
+*.deb
+*.rpm
+
+# ================================
+# 📚 Documentation Build Artifacts
+# ================================
+docs/_build/
+docs/html/
+docs/latex/
+
+# ================================
+# 🧠 Jupyter & Notebook Temp (optional)
+# ================================
+*.ipynb_checkpoints/
+
+# ================================
+# 🛠️ Visual Studio
+# ================================
+.vs/

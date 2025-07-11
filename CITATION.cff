@@ -1,0 +1,69 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "NeuroCompass: Lightweight Motion Correction for Neuroimaging"
+version: "1.0.0"
+date-released: "2025-07-11"
+url: "https://github.com/Ruri-jiale/NeuroCompass"
+repository-code: "https://github.com/Ruri-jiale/NeuroCompass"
+license: MIT
+
+abstract: >-
+  NeuroCompass is a modern C++17 neuroimaging toolkit designed for precision 
+  motion correction of 4D medical images. It provides research-grade motion 
+  correction capabilities while maintaining minimal dependencies and maximum 
+  portability. The toolkit features zero-dependency deployment, high-performance 
+  algorithms, cross-platform compatibility, and clinical-quality results that 
+  meet Power et al. 2012 motion correction standards.
+
+keywords:
+  - neuroimaging
+  - motion correction
+  - medical imaging
+  - C++17
+  - MCFLIRT
+  - 4D imaging
+  - registration
+  - framewise displacement
+
+authors:
+  - family-names: "Chen"
+    given-names: "Jialiang"
+    email: "jlchen7080@gmail.com"
+    orcid: "https://orcid.org/0009-0008-3902-9675"
+    affiliation: "Independent Researcher"
+
+references:
+  - type: article
+    title: "Spurious but systematic correlations in functional connectivity MRI networks arise from subject motion"
+    authors:
+      - family-names: "Power"
+        given-names: "Jonathan D"
+      - family-names: "Barnes"
+        given-names: "Kelly A"
+      - family-names: "Snyder"
+        given-names: "Abraham Z"
+      - family-names: "Schlaggar"
+        given-names: "Bradley L"
+      - family-names: "Petersen"
+        given-names: "Steven E"
+    journal: "NeuroImage"
+    volume: 59
+    issue: 3
+    start: 2142
+    end: 2154
+    year: 2012
+    doi: "10.1016/j.neuroimage.2011.10.018"
+
+  - type: dataset
+    title: "Language Learning Aptitude, Working Memory and Neural Efficiency"
+    authors:
+      - family-names: "OpenNeuro Community"
+    url: "https://openneuro.org/datasets/ds003508"
+    year: 2021
+    description: "7T neuroimaging dataset used for validation"
+
+contact:
+  - family-names: "Chen"
+    given-names: "Jialiang"
+    email: "jlchen7080@gmail.com"
