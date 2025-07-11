@@ -1,50 +1,75 @@
 # NeuroCompass 🧭
 
-A lightweight, modern C++17 neuroimaging motion correction toolkit for precision 4D medical image processing.
+A C++17 neuroimaging motion correction tool for precision 4D medical image processing.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![C++17](https://img.shields.io/badge/C++-17-blue.svg)](https://isocpp.org/std/the-standard)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)](https://github.com/Ruri-jiale/NeuroCompass)
+[![Status](https://img.shields.io/badge/Status-Motion%20Correction%20Focus-orange)](https://github.com/Ruri-jiale/NeuroCompass)
+
+## ⚠️ Project Status
+
+**NeuroCompass is currently focused on motion correction functionality.** The core motion correction system is fully operational and validated, while other modules are under development.
+
+### ✅ **Fully Working Components**:
+- **Motion Correction**: Complete 4D motion correction with clinical-grade accuracy
+- **Quality Assessment**: Framewise displacement calculation and outlier detection
+- **NIfTI I/O**: Compressed/uncompressed medical image file support
+
+### 🚧 **Under Development**:
+- **Brain Extraction**: Implementation exists but has compilation issues
+- **Registration Examples**: Code exists but requires build configuration fixes
+- **Advanced Features**: GPU acceleration, Python bindings (planned)
 
 ## Overview
 
-NeuroCompass is a modern neuroimaging toolkit designed for precision motion correction of 4D medical images. Built from the ground up with C++17, it provides research-grade motion correction capabilities while maintaining minimal dependencies and maximum portability.
+NeuroCompass is a C++17 neuroimaging tool designed for precision motion correction of 4D medical images. The current version provides research-grade motion correction capabilities with proven clinical accuracy.
 
-**🎯 Core Philosophy**: Navigate neural motion with precision - providing reliable, fast, and portable motion correction for the neuroimaging community.
+**🎯 Core Philosophy**: Navigate neural motion with precision - providing reliable, fast motion correction for the neuroimaging community.
 
-## ✨ Key Features
+## ✨ Key Features (Motion Correction Focus)
 
-- **🔧 Zero Dependencies**: Requires only standard C++17 libraries - no complex installations
-- **⚡ High Performance**: Optimized algorithms with real-time processing capabilities  
+- **🔧 Minimal Dependencies**: Requires ITK and standard C++17 libraries
+- **⚡ High Performance**: ~2.5 seconds for 144×144×60×57 volumes
 - **🌐 Cross-Platform**: Native support for Linux, macOS, and Windows
-- **📊 Clinical Quality**: Meets Power et al. 2012 motion correction standards
+- **📊 Clinical Quality**: Mean FD ~0.1mm, meets Power et al. 2012 standards
 - **🐳 Container Ready**: Perfect for cloud computing and containerized workflows
 - **🧪 Validated**: Tested with real 7T medical imaging data from OpenNeuro
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+- **C++17 compatible compiler** (GCC 7+, Clang 5+, MSVC 2017+)
+- **CMake 3.16+**
+- **ITK (Insight Toolkit) 5.0+** - for medical image processing
+- **zlib development libraries** - for compressed NIfTI support
+
 ### Installation
 
 ```bash
+# Install dependencies (Ubuntu/Debian)
+sudo apt-get install libinsighttoolkit5-dev libz-dev
+
 # Clone the repository
 git clone https://github.com/Ruri-jiale/NeuroCompass.git
 cd NeuroCompass
 
-# Build (requires GCC 7+ or Clang 5+)
+# Build with C++17 support
 mkdir build && cd build
-cmake ..
+cmake -DCMAKE_CXX_STANDARD=17 ..
 make -j$(nproc)
 ```
 
-### Basic Usage
+### Basic Usage (Motion Correction)
 
 ```bash
 # Process a 4D NIfTI file
-./neurocompass_motion your_4d_data.nii.gz
+./build/src/standalone/neurocompass_motion your_4d_data.nii.gz
 
 # Output includes:
 # - motion_parameters.par (motion parameters for each volume)
-# - Quality assessment metrics
+# - Quality assessment metrics  
 # - Processing statistics
 ```
 
@@ -57,12 +82,19 @@ Lightweight 4D medical image processing
 
 Image dimensions: 144x144x60x57
 Voxel size: 1.5x1.5x2.0 mm
-Processing time: 2.13 seconds
+Processing time: 2.50 seconds
 
 Motion Statistics:
+Volumes processed: 57
 Mean framewise displacement: 0.101 mm
 Maximum framewise displacement: 0.199 mm
-Quality grade: Excellent
+Motion outliers detected: 1
+
+Quality Assessment:
+Overall grade: Excellent
+Outlier percentage: 1.8%
+
+Motion correction completed successfully!
 ```
 
 ## 🏗️ Architecture
