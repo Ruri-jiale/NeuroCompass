@@ -16,7 +16,15 @@
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkResampleImageFilter.h"
 
+// Forward declaration for friend class
+namespace neurocompass {
+class OptimizedSimilarityMetrics;
+}
+
 class SimilarityMetrics {
+  // Allow OptimizedSimilarityMetrics to access private members
+  friend class neurocompass::OptimizedSimilarityMetrics;
+
 public:
   using PixelType = float;
   using ImageType = itk::Image<PixelType, 3>;
