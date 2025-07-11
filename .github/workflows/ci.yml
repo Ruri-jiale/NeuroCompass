@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, "fix/*" ]
   pull_request:
     branches: [ main ]
   release:
@@ -19,16 +19,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-20.04, macos-12, macos-13]
+        os: [ubuntu-22.04, macos-12, macos-13]
         include:
           - os: ubuntu-22.04
             install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit5-dev libgtest-dev cmake build-essential
-          - os: ubuntu-20.04
-            install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit4-dev libgtest-dev cmake build-essential
           - os: macos-12
-            install_deps: brew install insighttoolkit googletest cmake
+            install_deps: brew install itk googletest cmake
           - os: macos-13
-            install_deps: brew install insighttoolkit googletest cmake
+            install_deps: brew install itk googletest cmake
 
     steps:
     - uses: actions/checkout@v4
@@ -108,7 +106,7 @@ jobs:
         cppcheck --enable=all --inconclusive --xml --xml-version=2 src/ 2> cppcheck-report.xml || true
 
     - name: Upload cppcheck results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: cppcheck-report
         path: cppcheck-report.xml
@@ -179,7 +177,7 @@ jobs:
         doxygen
 
     - name: Upload documentation
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: documentation
         path: docs/doxygen/html/
@@ -207,7 +205,7 @@ jobs:
         ./run_tests.sh -m performance
 
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: benchmark-results
         path: tests/test_output/performance/
