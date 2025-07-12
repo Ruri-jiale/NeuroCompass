@@ -4,7 +4,8 @@ A C++17 neuroimaging motion correction tool for precision 4D medical image proce
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![C++17](https://img.shields.io/badge/C++-17-blue.svg)](https://isocpp.org/std/the-standard)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)](https://github.com/Ruri-jiale/NeuroCompass)
+[![Platform](https://img.shields.io/badge/Platform-Ubuntu%2022.04%20%7C%20macOS%2013-lightgrey)](https://github.com/Ruri-jiale/NeuroCompass)
+[![CI/CD](https://img.shields.io/badge/CI/CD-Core%20Build%20Only-green)](https://github.com/Ruri-jiale/NeuroCompass/actions)
 [![Status](https://img.shields.io/badge/Status-Motion%20Correction%20Focus-orange)](https://github.com/Ruri-jiale/NeuroCompass)
 
 ## ⚠️ Project Status
@@ -20,6 +21,12 @@ A C++17 neuroimaging motion correction tool for precision 4D medical image proce
 - **Brain Extraction**: Implementation exists but has compilation issues
 - **Registration Examples**: Code exists but requires build configuration fixes
 - **Advanced Features**: GPU acceleration, Python bindings (planned)
+
+### 🔧 **CI/CD Status**:
+- **Build Platforms**: Ubuntu 22.04 ✅ | macOS 13 ✅ (Windows support available but not CI tested)
+- **Current Focus**: Core build validation and motion correction functionality
+- **Temporarily Disabled**: Extended testing, linting, static analysis, documentation generation
+- **Note**: Full CI/CD pipeline will be restored as additional modules stabilize
 
 ## Overview
 
@@ -193,9 +200,9 @@ NeuroCompass provides comprehensive motion quality metrics:
 - Standard system libraries
 
 ### Supported Platforms
-- **Linux**: Ubuntu 20.04+, Arch Linux, Fedora, CentOS 7+
-- **macOS**: 10.15+ with Xcode command line tools
-- **Windows**: MSVC 2017+ or MinGW-w64
+- **Linux**: Ubuntu 22.04+ ✅ (CI tested), other distributions should work
+- **macOS**: 13+ ✅ (CI tested), 10.15+ should work with Xcode command line tools  
+- **Windows**: MSVC 2017+ or MinGW-w64 (manual build only, not CI tested)
 
 ### Building and Testing
 ```bash
@@ -203,11 +210,11 @@ NeuroCompass provides comprehensive motion quality metrics:
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 make -j$(nproc)
 
-# Run comprehensive tests
-cd tests && ./run_tests.sh
+# Core functionality testing (manual)
+./build/src/standalone/neurocompass_motion your_test_data.nii.gz
 
-# Performance testing
-./run_tests.sh -m performance
+# Note: Automated test suite temporarily disabled during module stabilization
+# Will be restored as additional modules are fixed
 ```
 
 ## 🤝 Contributing
