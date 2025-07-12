@@ -25,16 +25,12 @@ jobs:
             install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit5-dev libgtest-dev cmake build-essential
           - os: macos-12
             install_deps: |
-              brew update
               brew install cmake
-              brew install googletest
-              # Skip ITK for macOS-12 due to extremely long build times
+              # Skip ITK and GoogleTest for faster builds - core modules don't need them
           - os: macos-13
             install_deps: |
-              brew update
               brew install cmake
-              brew install googletest
-              # Skip ITK for macOS-13 due to extremely long build times
+              # Skip ITK and GoogleTest for faster builds - core modules don't need them
 
     steps:
     - uses: actions/checkout@v4
