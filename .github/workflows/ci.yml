@@ -19,15 +19,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12, macos-13]
+        os: [ubuntu-22.04, macos-13]
         include:
           - os: ubuntu-22.04
             install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit5-dev libgtest-dev cmake build-essential
-          - os: macos-12
-            install_deps: |
-              # Install essential build tools only
-              brew install cmake
-              # macOS already has clang compiler, just need build system
           - os: macos-13
             install_deps: |
               # Install essential build tools only  
