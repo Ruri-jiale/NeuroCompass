@@ -24,9 +24,17 @@ jobs:
           - os: ubuntu-22.04
             install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit5-dev libgtest-dev cmake build-essential
           - os: macos-12
-            install_deps: brew install itk googletest cmake
+            install_deps: |
+              brew update
+              brew install cmake
+              brew install googletest
+              # Skip ITK for macOS-12 due to extremely long build times
           - os: macos-13
-            install_deps: brew install itk googletest cmake
+            install_deps: |
+              brew update
+              brew install cmake
+              brew install googletest
+              # Skip ITK for macOS-13 due to extremely long build times
 
     steps:
     - uses: actions/checkout@v4
@@ -42,12 +50,18 @@ jobs:
 
     - name: Configure CMake
       run: |
+        # Clear FSL environment variables that might interfere
+        unset FSLDIR FSLWISH FSLTCLSH FSLMULTIFILEQUIT FSL_LOAD_NIFTI_EXTENSIONS FSL_SKIP_GLOBAL FSLOUTPUTTYPE || true
+        export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         mkdir build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
 
     - name: Build project
       run: |
+        # Clear FSL environment variables that might interfere
+        unset FSLDIR FSLWISH FSLTCLSH FSLMULTIFILEQUIT FSL_LOAD_NIFTI_EXTENSIONS FSL_SKIP_GLOBAL FSLOUTPUTTYPE || true
+        export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         cd build
         make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu || echo 4)
 

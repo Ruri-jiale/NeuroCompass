@@ -9,9 +9,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 
-# Find required packages
-find_package(ITK REQUIRED)
-include(${ITK_USE_FILE})
+# Find ITK (optional for standalone build)
+find_package(ITK QUIET)
+if(ITK_FOUND)
+    include(${ITK_USE_FILE})
+    message(STATUS "ITK found: ${ITK_VERSION}")
+else()
+    message(WARNING "ITK not found. Some features will be disabled.")
+endif()
 
 # Find OpenMP
 find_package(OpenMP)
