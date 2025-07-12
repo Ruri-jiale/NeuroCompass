@@ -25,12 +25,14 @@ jobs:
             install_deps: sudo apt-get update && sudo apt-get install -y libinsighttoolkit5-dev libgtest-dev cmake build-essential
           - os: macos-12
             install_deps: |
+              # Install essential build tools only
               brew install cmake
-              # Skip ITK and GoogleTest for faster builds - core modules don't need them
+              # macOS already has clang compiler, just need build system
           - os: macos-13
             install_deps: |
+              # Install essential build tools only  
               brew install cmake
-              # Skip ITK and GoogleTest for faster builds - core modules don't need them
+              # macOS already has clang compiler, just need build system
 
     steps:
     - uses: actions/checkout@v4
@@ -38,6 +40,7 @@ jobs:
         submodules: recursive
 
     - uses: aminya/setup-cpp@v1
+      if: matrix.os == 'ubuntu-22.04'
       with:
         compiler: gcc
 
@@ -73,22 +76,23 @@ jobs:
     #     chmod +x run_tests.sh
     #     ./run_tests.sh -m integration
 
-    - name: Generate test coverage (Ubuntu only)
-      if: matrix.os == 'ubuntu-22.04'
-      run: |
-        cd build
-        sudo apt-get install -y lcov
-        lcov --capture --directory . --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' --output-file coverage.info
-        lcov --list coverage.info
+    # Temporarily disable coverage generation while tests are disabled
+    # - name: Generate test coverage (Ubuntu only)
+    #   if: matrix.os == 'ubuntu-22.04'
+    #   run: |
+    #     cd build
+    #     sudo apt-get install -y lcov
+    #     lcov --capture --directory . --output-file coverage.info
+    #     lcov --remove coverage.info '/usr/*' --output-file coverage.info
+    #     lcov --list coverage.info
 
-    - name: Upload coverage to Codecov (Ubuntu only)
-      if: matrix.os == 'ubuntu-22.04'
-      uses: codecov/codecov-action@v3
-      with:
-        file: build/coverage.info
-        flags: unittests
-        name: codecov-umbrella
+    # - name: Upload coverage to Codecov (Ubuntu only)
+    #   if: matrix.os == 'ubuntu-22.04'
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     file: build/coverage.info
+    #     flags: unittests
+    #     name: codecov-umbrella
 
   # Temporarily disable lint check while fixing compilation issues
   # clang-format-check:
